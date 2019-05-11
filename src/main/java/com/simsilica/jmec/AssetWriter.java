@@ -96,7 +96,6 @@ public class AssetWriter {
         for( ModelInfo.Dependency dep : info.getDependencies() ) {
             AssetKey key = dep.getKey();
             
-log.info("key:" + key + "  folder:" + key.getFolder() + "  extension:" + key.getExtension() + "  name:" + key.getName());            
             String path = toTargetPath(key);
             File f = new File(target, path);
             f.getParentFile().mkdirs();
@@ -106,7 +105,6 @@ log.info("key:" + key + "  folder:" + key.getFolder() + "  extension:" + key.get
             // Set the new target to the dependency's key so that when
             // we write out the .j3o it will know about the new location.
             AssetKey newKey = rehome(path, key);
-log.info("Created new key:" + newKey);            
             dep.setKey(newKey);
         }
         
