@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        if( JavaVersion.current() == JavaVersion.VERSION_1_7 ) {
+            // Fallback for JDK 7 that can no longer connect to jcenter with https
+            maven { url "http://jcenter.bintray.com" }
+        } else {
+            jcenter()
+        }
+    }
+    dependencies {
+        // This sucks down a lot of stuff that 'normal' users wouldn't
+        // have and won't need anyway.
+        if( project.hasProperty('releaseUser') ) {
+            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+        }
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+apply plugin: 'application'
+
+mainClassName='com.simsilica.jmec.Convert'
+
+version='1.0.0-SNAPSHOT'
+group='com.simsilica'
+
+ext.jmeVersion = "3.2.3-stable"
+
+// Version meta-data
+ext {
+    releaseDescription = "JME-Convert ${project.version}"
+    releaseVcsTag = "${project.name}-v${project.version}"
+}
+
+// Project-wide meta-data
+ext {
+    bintrayLabels = ['jMonkeyEngine', 'gamedev', 'converter']
+    websiteUrl = 'https://github.com/Simsilica/JmeConvert'
+    vcsUrl = 'https://github.com/Simsilica/JmeConvert.git'
+    githubRepo = 'Simsilica/JmeConvert'
+    issueTrackerUrl = 'https://github.com/Simsilica/JmeConvert/issues'
+}
+
+repositories {
+    mavenLocal()
+
+    if( JavaVersion.current() == JavaVersion.VERSION_1_7 ) {
+        // Fallback for JDK 7 that can no longer connect to jcenter with https
+        maven { url "http://jcenter.bintray.com" }
+    } else {
+        jcenter()
+    }
+}
+
+sourceCompatibility = 1.7
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+// Make sure the build file declares what it actually imports
+configurations.compile {
+    transitive = false
+}
+
+dependencies {
+    compile "org.jmonkeyengine:jme3-core:$jmeVersion"
+
+    // Make sure we have all of the plugins, loaders, etc.
+    compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-plugins:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-blender:$jmeVersion"
+
+    compile 'com.google.guava:guava:19.0'
+
+    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile 'org.slf4j:jul-to-slf4j:1.7.13'
+    compile 'org.apache.logging.log4j:log4j-api:2.5'
+    compile 'org.apache.logging.log4j:log4j-core:2.5'
+    runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.11'
+}
+
+test {
+    testLogging {
+        // I want to see the tests that are run and pass, etc.
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+// Configuration to produce maven-repo style -sources and -javadoc jars
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+    exclude '**/.backups'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+
+// Put this at the end or it won't pick up the project.version and stuff
+if( project.hasProperty('releaseUser') ) {
+    apply plugin: 'com.jfrog.bintray'
+    apply from: 'https://raw.githubusercontent.com/Simsilica/gradle-plugins/master/simtools-release.gradle'
+}
+
+

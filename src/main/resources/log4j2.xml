@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="MyApp" packages="">
+  <Appenders>
+    <RollingFile name="RollingFile" fileName="converter.log" ignoreExceptions="false"                
+                 filePattern="logs/$${date:yyyy-MM}/demo-%d{MM-dd-yyyy}-%i.log.gz">
+      <PatternLayout>
+        <Pattern>%d{ABSOLUTE} %t %-5p [%c] %m%n</Pattern>        
+      </PatternLayout>
+      <OnStartupTriggeringPolicy />
+    </RollingFile>
+    
+    <Console name="STDOUT" target="SYSTEM_OUT" ignoreExceptions="false">
+      <!--<PatternLayout pattern="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/> -->
+      <PatternLayout pattern="%d{ABSOLUTE} %highlight{%-5p}{WARN=bright yellow, INFO=bright green, TRACE=blue} %style{[%c{1}]}{cyan} %highlight{%m%n}{FATAL=red blink, ERROR=Bright red, WARN=bright yellow, INFO=green, DEBUG=bright black, TRACE=blue}"/>
+    </Console>
+  </Appenders>
+  
+  <Loggers>
+
+    <Logger name="com.simsilica.jmec" level="DEBUG" />
+    <Logger name="com.jme3.util.clone" level="INFO" />
+ 
+    <Root level="DEBUG">
+      <AppenderRef ref="RollingFile"/>
+      <AppenderRef ref="STDOUT" level="INFO" />
+    </Root>
+  </Loggers>
+</Configuration>
+
+
