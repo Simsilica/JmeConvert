@@ -67,11 +67,11 @@ public class Convert {
     public static final String[] HELP = {
         "Usage: jmec [options] [models]",
         "",
-        "Where [models] are a list of j3o files.",
+        "Where [models] are a list of JME-compatible model files.",
         "",
         "Where [options] are:",
         " -sourceRoot <dir> : specifies the asset root for the models.",
-        "       Model paths will be evaluated relative to this root.",
+        "       Model dependency paths will be evaluated relative to this root.",
         "",
         " -targetRoot <dir> : specifies the asset target root for writing",
         "       converted assets and their dependencies.",
