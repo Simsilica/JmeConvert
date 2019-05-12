@@ -60,7 +60,7 @@ public class Convert {
         "    | || | | |\\/| | | _|  | (__ ",
         "     \\__/  |_|  |_| |___|  \\___|",
         "",
-        "    JME3 Asset Converter v1.0.0",
+        "    JME3 Asset Converter v" + BuildInfo.getVersion() + " build:" + BuildInfo.getBuildTime(),
         ""
     };
     
@@ -162,6 +162,13 @@ public class Convert {
         writer.write(info, s);
     }
 
+    public static void printMemInfo() {
+        long maxMem = Runtime.getRuntime().maxMemory();
+        double mem = maxMem / (1024.0 * 1024.0);
+        String s = String.format("%.2f mb", mem);
+        log.info("Max memory:" + s);
+    }
+
     public static void print( String... lines ) {
         for( String l : lines ) {
             System.out.println(l);
@@ -176,6 +183,8 @@ public class Convert {
         JulLogSetup.initialize();
 
         print(HEADER);        
+ 
+        printMemInfo();
  
         if( args.length == 0 ) {
             print(HELP);

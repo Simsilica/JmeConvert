@@ -6,6 +6,9 @@ buildscript {
         } else {
             jcenter()
         }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }        
     }
     dependencies {
         // This sucks down a lot of stuff that 'normal' users wouldn't
@@ -13,16 +16,20 @@ buildscript {
         if( project.hasProperty('releaseUser') ) {
             classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
         }
+        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.0.0"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: "com.gorylenko.gradle-git-properties"
 
 apply plugin: 'application'
 
 mainClassName='com.simsilica.jmec.Convert'
+
+applicationDefaultJvmArgs = ["-Xmx4g", "-Xms512m", "-XX:MaxDirectMemorySize=1024m"]
 
 version='1.0.0-SNAPSHOT'
 group='com.simsilica'
@@ -82,8 +89,13 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.5'
     runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
 
+    // Trying to get log coloring working properly on windows
+    runtime 'org.fusesource.jansi:jansi:1.11'
+    
     testCompile 'junit:junit:4.12'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.11'
+    
+    
 }
 
 test {
