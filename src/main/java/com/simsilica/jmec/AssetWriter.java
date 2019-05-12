@@ -105,6 +105,7 @@ public class AssetWriter {
             // Set the new target to the dependency's key so that when
             // we write out the .j3o it will know about the new location.
             AssetKey newKey = rehome(path, key);
+            //log.info("...setting key to:" + newKey);
             dep.setKey(newKey);
         }
         

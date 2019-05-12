@@ -108,9 +108,21 @@ public class ModelInfo {
             CloneableSmartAsset asset = (CloneableSmartAsset)val;
             log.info("material asset:" + asset);
             if( asset.getKey() != null ) {
-                dependencies.put(asset, new Dependency(root, asset));
+                addDependency(root, asset);
             }
         }        
+    }
+    
+    private Dependency addDependency( File root, CloneableSmartAsset asset ) {
+        Dependency result = dependencies.get(asset);
+        if( result == null ) {
+            dependencies.put(asset, new Dependency(root, asset));
+            return result; 
+        }
+        
+        // Else just add it to the existing
+        result.instances.add(asset);
+        return result; 
     }
     
     public static void dump( Spatial s ) {
@@ -146,12 +158,12 @@ public class ModelInfo {
     }
     
     public static class Dependency {
-        private CloneableSmartAsset asset;
         private AssetKey key;
         private File file;
+        private List<CloneableSmartAsset> instances = new ArrayList<>();
         
         public Dependency( File root, CloneableSmartAsset asset ) {
-            this.asset = asset;
+            instances.add(asset);
             this.key = asset.getKey();
             if( asset.getKey() != null ) {
                 this.file = new File(root, asset.getKey().toString());
@@ -163,11 +175,13 @@ public class ModelInfo {
         }
 
         public void setKey( AssetKey key ) {
-            asset.setKey(key);
+            for( CloneableSmartAsset asset : instances ) {
+                asset.setKey(key);
+            }
         }
         
         public AssetKey getKey() {
-            return asset.getKey();
+            return instances.get(0).getKey();
         }
         
         public File getSourceFile() {
