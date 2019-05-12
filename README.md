@@ -11,7 +11,7 @@ Current command line help:
 
 Usage: jmec [options] [models]
 
-Where [models] are a list of j3o files.
+Where [models] are a list of model files.
 
 Where [options] are:
  -sourceRoot <dir> : specifies the asset root for the models.
