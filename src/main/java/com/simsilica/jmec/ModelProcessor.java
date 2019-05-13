@@ -36,64 +36,14 @@
 
 package com.simsilica.jmec;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.net.URL;
-
-import org.slf4j.*;
-
-import com.jme3.asset.*;
-import com.jme3.asset.plugins.FileLocator;
-import com.jme3.scene.*;
 
 /**
- *  Wraps an AssetManager with localized configuration for reading assets
- *  from a certain directory tree.
+ *  Performs post-load operations on a model through its ModelInfo
+ *  wrapper.
  *
  *  @author    Paul Speed
  */
-public class AssetReader {
+public interface ModelProcessor {
 
-    public static final String DESKTOP_ASSET_CONFIG = "/com/jme3/asset/Desktop.cfg"; 
-
-    static Logger log = LoggerFactory.getLogger(AssetReader.class);
-
-    private Path root;
-    private DesktopAssetManager assets;
-
-    public AssetReader() {
-        this(new File("."));
-    }
-
-    public AssetReader( File assetRoot ) {
-        this(assetRoot, null);
-    }
-
-    public AssetReader( File assetRoot, URL assetConfig ) {
-        this.root = assetRoot.toPath();
-        log.info("Using source asset root:" + root);
-        
-        if( assetConfig == null ) {
-            assetConfig = getClass().getResource(DESKTOP_ASSET_CONFIG);
-            log.info("Found assetConfig:" + assetConfig);
-        }
-                
-        this.assets = new DesktopAssetManager(assetConfig);        
-        assets.registerLocator(root.toString(), FileLocator.class);
-    }
-    
-    public DesktopAssetManager getAssetManager() {
-        return assets;
-    }
-    
-    public Spatial loadModel( File f ) {
-        log.debug("loadModel(" + f + ")");
-        // Find the relative path
-        String path = root.relativize(f.toPath()).toString();
-
-        log.info("Loading asset:" + path);
-        return assets.loadModel(path);
-    }
+    public void apply( ModelInfo model );
 }
-
-

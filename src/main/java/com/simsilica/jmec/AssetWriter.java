@@ -54,10 +54,9 @@ import com.jme3.scene.*;
  *
  *  @author    Paul Speed
  */
-public class AssetWriter {
+public class AssetWriter implements ModelProcessor {
     static Logger log = LoggerFactory.getLogger(AssetWriter.class);
  
-    private File source;
     private File target;
     private String assetPath;
     
@@ -66,10 +65,6 @@ public class AssetWriter {
     
     public void setTarget( File target ) {
         this.target = target;
-    }
-    
-    public void setSource( File source ) {
-        this.source = source;
     }
     
     public void setAssetPath( String path ) {
@@ -89,8 +84,17 @@ public class AssetWriter {
         }
         return path;
     }
+ 
+    @Override
+    public void apply( ModelInfo info ) {
+        try {
+            write(info);
+        } catch( IOException e ) {
+            throw new RuntimeException("Error writing model:" + info.getModelName(), e);
+        }
+    }
     
-    public void write( ModelInfo info, Spatial model ) throws IOException {
+    public void write( ModelInfo info ) throws IOException {
     
         // Write the dependencies first, rehoming their keys as necessary.
         for( ModelInfo.Dependency dep : info.getDependencies() ) {

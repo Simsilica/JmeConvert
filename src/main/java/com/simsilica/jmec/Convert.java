@@ -64,6 +64,8 @@ public class Convert {
         ""
     };
     
+    public static final String ALL_PROBE_OPTIONS = "btrscpd";
+    
     public static final String[] HELP = {
         "Usage: jmec [options] [models]",
         "",
@@ -79,6 +81,17 @@ public class Convert {
         " -targetPath <path> : a path string specifying where to place",
         "       the copied/converted assets within the targetRoot.  Any",
         "       internal asset keys will be 'rehomed' to this path.",
+        " -probe [probe options string] : configures the information that the probe",
+        "       will output.",
+        "       [probe options]:",
+        "       A : all options turned on, same as: " + ALL_PROBE_OPTIONS,
+        "       b : show bounding volumes",
+        "       t : show translations",
+        "       r : show rotation",
+        "       s : show scale",
+        "       c : show the list of controls",
+        "       p : show material parameters",
+        "       d : list asset dependencies",
         "",
         "Examples:",
         "",
@@ -102,9 +115,33 @@ public class Convert {
     private File targetRoot;
     private String targetAssetPath;
     private AssetReader assets;
-    private AssetWriter writer = new AssetWriter();
+    private AssetWriter writer;
+    private Probe probe = null;
+    private String probeOptions = null;
+ 
+    private List<ModelProcessor> processors = new ArrayList<>();
  
     public Convert() {
+    }
+    
+    public AssetReader getAssetReader() {
+        return assets;
+    }
+    
+    protected AssetWriter getAssetWriter() {
+        if( writer == null ) {
+            writer = new AssetWriter();
+            processors.add(writer);
+        }
+        return writer;
+    }
+    
+    protected Probe getProbe() {
+        if( probe == null ) {
+            probe = new Probe();
+            processors.add(0, probe);
+        }
+        return probe; 
     }
 
     public void setSourceRoot( File f ) {
@@ -118,7 +155,6 @@ public class Convert {
         }
         this.sourceRoot = f;
         this.assets = new AssetReader(f);
-        writer.setSource(f);
     }
     
     public File getSourceRoot() {
@@ -127,7 +163,7 @@ public class Convert {
     
     public void setTargetRoot( File f ) {
         this.targetRoot = f;
-        writer.setTarget(f);
+        getAssetWriter().setTarget(f);
     }
     
     public File getTargetRoot() {
@@ -136,11 +172,50 @@ public class Convert {
  
     public void setTargetAssetPath( String path ) {
         this.targetAssetPath = path;
-        writer.setAssetPath(path);
+        getAssetWriter().setAssetPath(path);
     }
     
     public String getTargetAssetPath() {
         return targetAssetPath;
+    }
+
+    public void setProbeOptions( String options ) {
+        this.probeOptions = options;
+        for( char c : options.toCharArray() ) {
+            switch( c ) {
+                case 'A':
+                    setProbeOptions(ALL_PROBE_OPTIONS);
+                    break;
+                case 'b':
+                    getProbe().setShowBounds(true);
+                    break;
+                case 't':
+                    getProbe().setShowTranslation(true);
+                    break;
+                case 'r':
+                    getProbe().setShowRotation(true);
+                    break;
+                case 's':
+                    getProbe().setShowScale(true);
+                    break;
+                case 'c':
+                    getProbe().setShowControls(true);
+                    break;
+                case 'p':
+                    getProbe().setShowAllMaterialParameters(true);
+                    break;
+                case 'd':
+                    getProbe().setShowDependencies(true);
+                    break;
+                default:
+                    log.warn("Unknown probe option:" + c);
+                    break;
+            }
+        }        
+    }
+    
+    public String getProbeOptions() {
+        return probeOptions;
     }
     
     public void convert( File f ) throws IOException {
@@ -150,16 +225,20 @@ public class Convert {
         }
         log.info("Convert:" + f);        
         Spatial s = assets.loadModel(f);
-        log.info("Loaded:" + s);
-        ModelInfo.dump(s);
  
         ModelInfo info = new ModelInfo(sourceRoot, f.getName(), s);
-        
-        for( ModelInfo.Dependency dep : info.getDependencies() ) {
-            log.info("" + dep);
+        runProcessors(info);          
+    }
+
+    public void runProcessors( ModelInfo info ) {
+        if( processors.isEmpty() ) {
+            log.warn("No output configured, probing instead.");
+            getProbe(); // just let it use defaults
         }
-        
-        writer.write(info, s);
+        log.info("Processing:" + info.getModelName());
+        for( ModelProcessor proc : processors ) {
+            proc.apply(info);
+        }
     }
 
     public static void printMemInfo() {
@@ -202,16 +281,19 @@ public class Convert {
                 convert.setTargetRoot(new File(it.next()));
             } else if( "-targetPath".equals(arg) ) {
                 convert.setTargetAssetPath(it.next());
+            } else if( "-probe".equals(arg) ) {
+                convert.setProbeOptions(it.next());
             } else {
                 convert.convert(new File(arg));               
             }
         }
  
         if( args.length == 0 && test ) {
-            convert.setSourceRoot(new File("sampleSource"));
-            convert.setTargetRoot(new File("sampleTarget"));
-            convert.setTargetAssetPath("foo");       
-            convert.convert(new File("sampleSource/scene.gltf"));
+            convert.setSourceRoot(new File("sampleSource2"));
+            //convert.setTargetRoot(new File("sampleTarget"));
+            //convert.setTargetAssetPath("foo");
+            convert.setProbeOptions("d");       
+            convert.convert(new File("sampleSource2/scene.gltf"));
         }
     }
 }

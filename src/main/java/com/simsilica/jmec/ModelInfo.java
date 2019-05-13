@@ -81,9 +81,13 @@ public class ModelInfo {
     public Collection<Dependency> getDependencies() {
         return dependencies.values();
     }
+ 
+    public Dependency getDependency( CloneableSmartAsset asset ) {
+        return dependencies.get(asset);
+    }
     
     private void findDependencies( Spatial s ) {
-        log.info("findDependencies(" + s + ")");
+        log.debug("findDependencies(" + s + ")");
         if( s instanceof Node ) {
             Node n = (Node)s;
             for( Spatial child : n.getChildren() ) {
@@ -95,18 +99,18 @@ public class ModelInfo {
     }
     
     private void findDependencies( Material m ) {
-        log.info("findDependencies(" + m + ")");
+        log.debug("findDependencies(" + m + ")");
         if( m.getKey() != null ) {
             dependencies.put(m, new Dependency(root, m));   
         }
         for( MatParam mp : m.getParams() ) {
-            log.info("Checking:" + mp);
+            log.debug("Checking:" + mp);
             Object val = mp.getValue();
             if( !(val instanceof CloneableSmartAsset) ) {
                 continue;
             }
             CloneableSmartAsset asset = (CloneableSmartAsset)val;
-            log.info("material asset:" + asset);
+            log.debug("material asset:" + asset);
             if( asset.getKey() != null ) {
                 addDependency(root, asset);
             }
@@ -125,39 +129,7 @@ public class ModelInfo {
         return result; 
     }
     
-    public static void dump( Spatial s ) {
-        dump("", s);
-    }
-    
-    public static void dump( String indent, Spatial s ) {
-        StringBuilder sb = new StringBuilder();
-        if( s.getName() == null ) {
-            sb.append(s.getClass().getSimpleName() + "()");
-        } else {
-            sb.append(s.getClass().getSimpleName() + "(" + s.getName() + ")");
-        }
-        if( s.getKey() != null ) {
-            sb.append(" key:" + s.getKey());
-        }
-        log.info(indent + sb);
-        if( s instanceof Node ) {
-            Node n = (Node)s;
-            for( Spatial child : n.getChildren() ) {
-                dump(indent + "  ", child);
-            }
-        } if( s instanceof Geometry ) {
-            dump(indent + "    ", ((Geometry)s).getMaterial());
-        }
-    }
-    
-    public static void dump( String indent, Material m ) {
-        log.info(indent + m + (m.getKey() != null ? "  key:" + m.getKey() : ""));
-        for( MatParam mp : m.getParams() ) {
-            log.info(indent + "  " + mp);
-        }
-    }
-    
-    public static class Dependency {
+    public static class Dependency implements Comparable<Dependency> {
         private AssetKey key;
         private File file;
         private List<CloneableSmartAsset> instances = new ArrayList<>();
@@ -168,6 +140,12 @@ public class ModelInfo {
             if( asset.getKey() != null ) {
                 this.file = new File(root, asset.getKey().toString());
             }
+        }
+
+        public int compareTo( Dependency other ) {
+            String s1 = key.toString();
+            String s2 = other.getKey().toString();
+            return s1.compareTo(s2);
         }
 
         public AssetKey getOriginalKey() {
@@ -186,6 +164,10 @@ public class ModelInfo {
         
         public File getSourceFile() {
             return file;
+        }
+ 
+        public List<CloneableSmartAsset> getInstances() {
+            return instances;
         }
  
         @Override       
