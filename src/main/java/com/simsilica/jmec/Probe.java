@@ -124,7 +124,7 @@ public class Probe implements ModelProcessor {
     
     @Override
     public void apply( ModelInfo info ) {
-        probe("", info.getModel(), info);
+        probe("", info.getModelRoot(), info);
         if( showDependencies ) {
             listDependencies("", info);
         }

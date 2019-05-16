@@ -65,8 +65,60 @@ public class ModelInfo {
         this.model = model;
         findDependencies(model);
     }
+
+    /**
+     *  Returns a collection containing all of the children (and their children)
+     *  that match the specified name.  It uses a breadth first traversal
+     *  such that items earlier in the results are higher in the tree. 
+     */
+    public List<Spatial> findAll( String name ) {
+        return findAll(name, Spatial.class);
+    }    
  
-    public Spatial getModel() {
+    /**
+     *  Returns a collection containing all of the children (and their children)
+     *  that match the specified name and type.  It uses a breadth first traversal
+     *  such that items earlier in the results are higher in the tree. 
+     */
+    public <T> List<T> findAll( final String name, final Class<T> type ) {    
+        // Check the type argument because from groovy scripts it's common
+        // to pass the wrong node type
+        if( !Spatial.class.isAssignableFrom(type) ) {
+            throw new IllegalArgumentException("Type is not a Spatial compatible type:" + type);
+        }    
+        final List<T> results = new ArrayList<>();
+        model.breadthFirstTraversal(new SceneGraphVisitor() {
+                public void visit( Spatial spatial ) {
+                    if( Objects.equals(name, spatial.getName()) && type.isInstance(spatial) ) {
+                        results.add(type.cast(spatial));
+                    }  
+                }
+            });
+        return results;
+    }
+
+    /**
+     *  Returns the first breadth-first-search result that matches the specified name.
+     */
+    public Spatial findFirst( String name ) {
+        return findFirst(name, Spatial.class);    
+    }
+
+    /**
+     *  Returns the first breadth-first-search result that matches the specified name and type.
+     */
+    public <T> T findFirst( final String name, final Class<T> type ) {
+        
+        // Without a custom traverser, there is no way to early-out anyway... 
+        // so we'll just leverage the other method.
+        List<T> results = findAll(name, type);
+        if( results.isEmpty() ) {
+            return null;
+        }
+        return results.get(0);
+    }
+ 
+    public Spatial getModelRoot() {
         return model;
     }
  

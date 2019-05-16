@@ -116,7 +116,7 @@ public class AssetWriter implements ModelProcessor {
         // Write the j3o
         File outFile = new File(target, toTargetPath(info.getModelName() + ".j3o"));
         log.info("Writing:" + outFile);
-        BinaryExporter.getInstance().save(info.getModel(), outFile);
+        BinaryExporter.getInstance().save(info.getModelRoot(), outFile);
     }
     
     private static AssetKey rehome( String newPath, AssetKey key ) {

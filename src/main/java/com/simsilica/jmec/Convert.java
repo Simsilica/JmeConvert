@@ -118,6 +118,7 @@ public class Convert {
     private AssetWriter writer;
     private Probe probe = null;
     private String probeOptions = null;
+    private List<String> modelScripts = new ArrayList<>();
  
     private List<ModelProcessor> processors = new ArrayList<>();
  
@@ -218,6 +219,15 @@ public class Convert {
         return probeOptions;
     }
     
+    public void addModelScript( String script ) {
+        modelScripts.add(script);
+        processors.add(new ModelScript(this, script));
+    }
+    
+    public List<String> getModelScripts() {
+        return modelScripts;
+    }
+    
     public void convert( File f ) throws IOException {
         if( !f.exists() ) {
             log.error("File doesn't exist:" + f);
@@ -289,11 +299,12 @@ public class Convert {
         }
  
         if( args.length == 0 && test ) {
-            convert.setSourceRoot(new File("sampleSource2"));
-            //convert.setTargetRoot(new File("sampleTarget"));
-            //convert.setTargetAssetPath("foo");
-            convert.setProbeOptions("d");       
-            convert.convert(new File("sampleSource2/scene.gltf"));
+            convert.setSourceRoot(new File("sampleSource"));
+            convert.addModelScript("test-script.groovy");       
+            convert.setTargetRoot(new File("sampleTarget"));
+            convert.setTargetAssetPath("foo");
+            convert.setProbeOptions("bd");
+            convert.convert(new File("sampleSource/scene.gltf"));            
         }
     }
 }

@@ -83,6 +83,9 @@ dependencies {
 
     compile 'com.google.guava:guava:19.0'
 
+    // For runtime scripting support
+    runtime 'org.codehaus.groovy:groovy-all:2.4.11'
+
     compile 'org.slf4j:slf4j-api:1.7.13'
     compile 'org.slf4j:jul-to-slf4j:1.7.13'
     compile 'org.apache.logging.log4j:log4j-api:2.5'
