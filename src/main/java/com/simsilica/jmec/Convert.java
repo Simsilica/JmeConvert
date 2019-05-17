@@ -81,6 +81,13 @@ public class Convert {
         " -targetPath <path> : a path string specifying where to place",
         "       the copied/converted assets within the targetRoot.  Any",
         "       internal asset keys will be 'rehomed' to this path.",
+        "",
+        " -script <path> : a script file that will be run against the model",
+        "       before writing out.  Any number of script files can be specified",
+        "       and they will be run in the order specified.",
+        "       Groovy and Javascript are supported 'out of the box' but any ",
+        "       JSR 223 compatible scripting engine should work if on the classpath.",
+        "",
         " -probe [probe options string] : configures the information that the probe",
         "       will output.",
         "       [probe options]:",
@@ -298,6 +305,8 @@ public class Convert {
                 convert.setTargetRoot(new File(it.next()));
             } else if( "-targetPath".equals(arg) ) {
                 convert.setTargetAssetPath(it.next());
+            } else if( "-script".equals(arg) ) {
+                convert.addModelScript(it.next());
             } else if( "-probe".equals(arg) ) {
                 convert.setProbeOptions(it.next());
             } else {
