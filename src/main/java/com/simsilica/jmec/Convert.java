@@ -266,7 +266,7 @@ public class Convert {
 
     public static void main( String... args ) throws Exception {
 
-        boolean test = true;
+        boolean test = false;
 
         // Forward JUL logging to slf4j
         JulLogSetup.initialize();

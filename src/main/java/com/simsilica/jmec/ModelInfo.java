@@ -98,6 +98,28 @@ public class ModelInfo {
     }
 
     /**
+     *  Returns a collection containing all of the children (and their children)
+     *  that match the type.  It uses a breadth first traversal
+     *  such that items earlier in the results are higher in the tree. 
+     */
+    public <T> List<T> findAll( final Class<T> type ) {    
+        // Check the type argument because from groovy scripts it's common
+        // to pass the wrong node type
+        if( !Spatial.class.isAssignableFrom(type) ) {
+            throw new IllegalArgumentException("Type is not a Spatial compatible type:" + type);
+        }    
+        final List<T> results = new ArrayList<>();
+        model.breadthFirstTraversal(new SceneGraphVisitor() {
+                public void visit( Spatial spatial ) {
+                    if( type.isInstance(spatial) ) {
+                        results.add(type.cast(spatial));
+                    }  
+                }
+            });
+        return results;
+    }
+
+    /**
      *  Returns the first breadth-first-search result that matches the specified name.
      */
     public Spatial findFirst( String name ) {
