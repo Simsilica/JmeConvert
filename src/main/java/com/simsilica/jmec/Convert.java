@@ -221,7 +221,14 @@ public class Convert {
     
     public void addModelScript( String script ) {
         modelScripts.add(script);
-        processors.add(new ModelScript(this, script));
+        if( writer == null ) {
+            // It's fine just to add them directly
+            processors.add(new ModelScript(this, script));
+        } else {
+            // We need to add them before the asset writer
+            int index = processors.indexOf(writer);
+            processors.add(index, new ModelScript(this, script)); 
+        }
     }
     
     public List<String> getModelScripts() {
@@ -300,10 +307,10 @@ public class Convert {
  
         if( args.length == 0 && test ) {
             convert.setSourceRoot(new File("sampleSource"));
-            convert.addModelScript("test-script.groovy");       
             convert.setTargetRoot(new File("sampleTarget"));
             convert.setTargetAssetPath("foo");
             convert.setProbeOptions("bd");
+            convert.addModelScript("test-script.groovy");       
             convert.convert(new File("sampleSource/scene.gltf"));            
         }
     }
