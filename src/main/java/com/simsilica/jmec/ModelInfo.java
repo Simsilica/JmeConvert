@@ -136,6 +136,15 @@ public class ModelInfo {
  
     public Dependency getDependency( CloneableSmartAsset asset ) {
         return dependencies.get(asset);
+    }      
+    
+    public void generateMaterial( Material material, String assetName ) {
+        log.debug("generateMaterial(" + material + ", " + assetName + ")");
+        if( !assetName.toLowerCase().endsWith(".j3m") ) {
+            assetName = assetName + ".j3m";
+        }
+        Dependency dep = addDependency(null, material);
+        dep.setKey(new MaterialKey(assetName));
     }
     
     private void findDependencies( Spatial s ) {
@@ -172,7 +181,8 @@ public class ModelInfo {
     private Dependency addDependency( File root, CloneableSmartAsset asset ) {
         Dependency result = dependencies.get(asset);
         if( result == null ) {
-            dependencies.put(asset, new Dependency(root, asset));
+            result = new Dependency(root, asset); 
+            dependencies.put(asset, result);
             return result; 
         }
         

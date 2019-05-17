@@ -117,8 +117,6 @@ log.info("Script engine:" + engine);
     @Override
     public void apply( ModelInfo model ) {
         log.info("Running script:" + scriptName + " against:" + model.getModelName());
-log.info("script:" + script);
-log.info("compiledScript:" + compiledScript);        
         bindings.put("model", model);
         try {
             if( compiledScript != null ) {

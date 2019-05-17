@@ -46,7 +46,9 @@ import com.google.common.io.Files;
 
 import com.jme3.asset.*;
 import com.jme3.export.binary.BinaryExporter;
+import com.jme3.material.*;
 import com.jme3.scene.*;
+import com.jme3.material.plugin.export.material.J3MExporter;
 
 /**
  *  Writes an asset to a target directory structure, copying or
@@ -56,6 +58,8 @@ import com.jme3.scene.*;
  */
 public class AssetWriter implements ModelProcessor {
     static Logger log = LoggerFactory.getLogger(AssetWriter.class);
+
+    private static J3MExporter j3mExporter = new J3MExporter();
  
     private File target;
     private String assetPath;
@@ -96,15 +100,44 @@ public class AssetWriter implements ModelProcessor {
     
     public void write( ModelInfo info ) throws IOException {
     
-        // Write the dependencies first, rehoming their keys as necessary.
+        // Write the real file dependencies first, rehoming their keys as necessary.
         for( ModelInfo.Dependency dep : info.getDependencies() ) {
+            if( dep.getSourceFile() == null ) {
+                // It's a generated asset
+                continue;
+            }        
             AssetKey key = dep.getKey();
             
             String path = toTargetPath(key);
             File f = new File(target, path);
             f.getParentFile().mkdirs();
-            log.info("Copying:" + dep.getSourceFile() + " to:" + f);
-            Files.copy(dep.getSourceFile(), f);
+            
+            if( dep.getSourceFile() != null ) {
+                log.info("Copying:" + dep.getSourceFile() + " to:" + f);
+                Files.copy(dep.getSourceFile(), f);
+            } 
+            
+            // Set the new target to the dependency's key so that when
+            // we write out the .j3o it will know about the new location.
+            AssetKey newKey = rehome(path, key);
+            //log.info("...setting key to:" + newKey);
+            dep.setKey(newKey);
+        }
+
+        // Then generate the generated assets after writing the real file
+        // assets... because the generated assets may need the updated keys from
+        // the first loop.
+        for( ModelInfo.Dependency dep : info.getDependencies() ) {
+            if( dep.getSourceFile() != null ) {
+                // It's a real file asset
+                continue;
+            }        
+            AssetKey key = dep.getKey();
+            
+            String path = toTargetPath(key);
+            File f = new File(target, path);
+            f.getParentFile().mkdirs();
+            generateDependency(f, dep);
             
             // Set the new target to the dependency's key so that when
             // we write out the .j3o it will know about the new location.
@@ -118,6 +151,20 @@ public class AssetWriter implements ModelProcessor {
         log.info("Writing:" + outFile);
         BinaryExporter.getInstance().save(info.getModelRoot(), outFile);
     }
+ 
+    protected void generateDependency( File file, ModelInfo.Dependency dep ) throws IOException {
+        CloneableSmartAsset asset = dep.getInstances().get(0); // should always be at least one
+        if( asset instanceof Material ) {
+            writeJ3m(file, dep, (Material)asset);
+        } else {
+            throw new UnsupportedOperationException("Type not supported for generation:" + asset);
+        }
+    }
+ 
+    protected void writeJ3m( File file, ModelInfo.Dependency dep, Material material ) throws IOException {
+        log.info("Writing material:" + file);
+        j3mExporter.save(material, file);
+    }  
     
     private static AssetKey rehome( String newPath, AssetKey key ) {
         try {
