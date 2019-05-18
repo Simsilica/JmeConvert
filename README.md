@@ -34,13 +34,14 @@ Where [options] are:
  -probe [probe options string] : configures the information that the probe
        will output.
        [probe options]:
-       A : all options turned on, same as: btrscpd
+       A : all options turned on, same as: btrscpdu
        b : show bounding volumes
        t : show translations
        r : show rotation
        s : show scale
        c : show the list of controls
        p : show material parameters
+       u : show user-added data
        d : list asset dependencies
 
 Examples:
