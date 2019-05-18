@@ -64,7 +64,7 @@ public class Convert {
         ""
     };
     
-    public static final String ALL_PROBE_OPTIONS = "btrscpd";
+    public static final String ALL_PROBE_OPTIONS = "btrscpdu";
     
     public static final String[] HELP = {
         "Usage: jmec [options] [models]",
@@ -98,6 +98,7 @@ public class Convert {
         "       s : show scale",
         "       c : show the list of controls",
         "       p : show material parameters",
+        "       u : show user-added data",
         "       d : list asset dependencies",
         "",
         "Examples:",
@@ -215,6 +216,9 @@ public class Convert {
                 case 'd':
                     getProbe().setShowDependencies(true);
                     break;
+                case 'u':
+                    getProbe().setShowUserData(true);
+                    break;
                 default:
                     log.warn("Unknown probe option:" + c);
                     break;
@@ -280,7 +284,7 @@ public class Convert {
 
     public static void main( String... args ) throws Exception {
 
-        boolean test = false;
+        boolean test = true;
 
         // Forward JUL logging to slf4j
         JulLogSetup.initialize();
@@ -315,12 +319,21 @@ public class Convert {
         }
  
         if( args.length == 0 && test ) {
-            convert.setSourceRoot(new File("sampleSource"));
-            convert.setTargetRoot(new File("sampleTarget"));
-            convert.setTargetAssetPath("foo");
-            convert.setProbeOptions("bd");
-            convert.addModelScript("test-script.groovy");       
-            convert.convert(new File("sampleSource/scene.gltf"));            
+            boolean testConvert = true;
+            if( testConvert ) {
+                convert.setSourceRoot(new File("sampleSource3"));
+                convert.setTargetRoot(new File("sampleTarget"));
+                convert.setTargetAssetPath("foo");
+                convert.setProbeOptions("bd");
+                //convert.addModelScript("test-script.groovy");       
+                //convert.convert(new File("sampleSource/scene.gltf"));            
+                convert.convert(new File("sampleSource3/door.gltf"));
+            } else {
+                // Test reloading what we converted
+                convert.setSourceRoot(new File("sampleTarget"));
+                convert.setProbeOptions("du");
+                convert.convert(new File("sampleTarget/foo/door.gltf.j3o"));
+            }            
         }
     }
 }

@@ -42,9 +42,13 @@ import java.net.URL;
 
 import org.slf4j.*;
 
+import com.google.common.io.Files;
+
 import com.jme3.asset.*;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.scene.*;
+
+import com.simsilica.jmec.gltf.GltfExtrasLoader;
 
 /**
  *  Wraps an AssetManager with localized configuration for reading assets
@@ -92,7 +96,17 @@ public class AssetReader {
         String path = root.relativize(f.toPath()).toString();
 
         log.info("Loading asset:" + path);
-        return assets.loadModel(path);
+        
+        // AssetManager doesn't really give us a better way to resolve types
+        // so we'll make some assumptions... it helps that we control the 
+        // asset manager ourselves here.
+        String extension = Files.getFileExtension(f.getName());
+        if( "gltf".equalsIgnoreCase(extension) ) {
+            // We do special setup for GLTF
+            return assets.loadModel(GltfExtrasLoader.createModelKey(path));
+        } else {
+            return assets.loadModel(path);
+        }
     }
 }
 

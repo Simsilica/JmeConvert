@@ -62,6 +62,7 @@ public class Probe implements ModelProcessor {
     private boolean showControls;
     private boolean showAllMaterialParameters;
     private boolean showDependencies;
+    private boolean showUserData;
 
     public Probe() {
     }
@@ -72,6 +73,14 @@ public class Probe implements ModelProcessor {
     
     public boolean getShowDependencies() {
         return showDependencies;
+    }
+ 
+    public void setShowUserData( boolean showUserData ) {
+        this.showUserData = showUserData;
+    }
+    
+    public boolean getShowUserData() {
+        return showUserData;
     }
    
     public void setShowBounds( boolean showBounds ) {
@@ -193,6 +202,9 @@ public class Probe implements ModelProcessor {
         if( showScale ) {
             log.info(indent + "localScale:" + s.getLocalScale());
         } 
+        if( showUserData ) {
+            writeUserData(indent + "userData:", s);
+        }
         if( showControls ) {
             if( s.getNumControls() > 0 ) {
                 log.info(indent + "controls:");
@@ -201,6 +213,12 @@ public class Probe implements ModelProcessor {
                     log.info(indent + " [" + i + "]:" + c);
                 }
             }
+        } 
+    }
+
+    protected void writeUserData( String indent, Spatial s ) {
+        for( String name : s.getUserDataKeys() ) {
+            log.info(indent + name + "=" + s.getUserData(name));
         } 
     }
 
