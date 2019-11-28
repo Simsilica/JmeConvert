@@ -1,6 +1,8 @@
 Version 1.1.1
 --------------
-
+* Modified to default -sourceRoot to the current directory if not
+    specified.
+    
 
 Version 1.1.0
 --------------
