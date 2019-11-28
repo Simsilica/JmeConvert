@@ -110,18 +110,21 @@ public class GltfExtrasLoader implements ExtrasLoader {
     protected void applyToSpatial( Spatial spatial, JsonObject extras ) {
         for( Map.Entry<String, JsonElement> el : extras.entrySet() ) {
             log.debug(el.toString());
-            Object val = toAttribute(el.getValue());
+            Object val = toAttribute(el.getValue(), false);
+            if( log.isDebugEnabled() ) {
+                log.debug("setUserData(" + el.getKey() + ", " + val + ")");
+            }            
             spatial.setUserData(el.getKey(), val);
         }         
     }
  
-    protected Object toAttribute( JsonElement el ) {
+    protected Object toAttribute( JsonElement el, boolean nested ) {
         if( el.isJsonObject() ) {
-            return toAttribute(el.getAsJsonObject());
+            return toAttribute(el.getAsJsonObject(), nested);
         } else if( el.isJsonArray() ) {
-            return toAttribute(el.getAsJsonArray());
+            return toAttribute(el.getAsJsonArray(), nested);
         } else if( el.isJsonPrimitive() ) {
-            return toAttribute(el.getAsJsonPrimitive());
+            return toAttribute(el.getAsJsonPrimitive(), nested);
         } else if( el.isJsonNull() ) {
             return null;
         }
@@ -129,27 +132,47 @@ public class GltfExtrasLoader implements ExtrasLoader {
         return null;       
     }
     
-    protected Object toAttribute( JsonObject jo ) {
+    protected Object toAttribute( JsonObject jo, boolean nested ) {
         Map<String, Object> result = new HashMap<>();
         for( Map.Entry<String, JsonElement> el : jo.entrySet() ) {
-            result.put(el.getKey(), toAttribute(el.getValue())); 
+            result.put(el.getKey(), toAttribute(el.getValue(), true)); 
         }
         return result;       
     }
     
-    protected Object toAttribute( JsonArray ja ) {
+    protected Object toAttribute( JsonArray ja, boolean nested ) {
         List<Object> result = new ArrayList<>();
         for( JsonElement el : ja ) {
-            result.add(toAttribute(el));
+            result.add(toAttribute(el, true));
         }
         return result;
     }
     
-    protected Object toAttribute( JsonPrimitive jp ) {
+    protected Object toAttribute( JsonPrimitive jp, boolean nested ) {
         if( jp.isBoolean() ) {
             return jp.getAsBoolean();
         } else if( jp.isNumber() ) {
-            return jp.getAsNumber();
+            // JME doesn't save Maps properly and treats them as two
+            // separate Lists... and it doesn't like saving Doubles
+            // in lists so we'll just return strings in the case where
+            // the value would end up in a map.  If users someday really
+            // need properly typed map values and JME map storage hasn't
+            // been fixed then perhaps we give the users the option of
+            // flattening the nested properties into dot notation, ie:
+            // all directly on UserData with no Map children.
+            if( nested ) {
+                return jp.getAsString();
+            }
+            Number num = jp.getAsNumber();
+            // JME doesn't like to save GSON's LazilyParsedNumber so we'll
+            // convert it into a real number.  I don't think we can reliably
+            // guess what type of number the user intended.  It would take
+            // some expirimentation to determine if things like 0.0 are preserved
+            // during export or just get exported as 0.
+            // Rather than randomly flip-flop between number types depending
+            // on the inclusion (or not) of a decimal point, we'll just always
+            // return Double. 
+            return num.doubleValue();
         } else if( jp.isString() ) {
             return jp.getAsString();
         }

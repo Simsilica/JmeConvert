@@ -2,6 +2,10 @@ Version 1.1.1
 --------------
 * Modified to default -sourceRoot to the current directory if not
     specified.
+* Fixed an issue saving J3o files that had GLTF imported user-data
+    that was not strings.  During import, these are now specifically
+    converted to Double or are treated as String if they are nested
+    in such a way that JME does not support.    
     
 
 Version 1.1.0
