@@ -1,4 +1,4 @@
-Version 1.1.1
+Version 1.1.1 (latest)
 --------------
 * Modified to default -sourceRoot to the current directory if not
     specified.
