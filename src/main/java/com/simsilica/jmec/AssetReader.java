@@ -74,7 +74,11 @@ public class AssetReader {
     }
 
     public AssetReader( File assetRoot, URL assetConfig ) {
-        this.root = assetRoot.toPath();
+        try {
+            this.root = assetRoot.getCanonicalFile().toPath();
+        } catch( java.io.IOException e ) {
+            throw new RuntimeException("Error getting canonical path for:" + assetRoot, e);
+        }
         log.info("Using source asset root:" + root);
         
         if( assetConfig == null ) {
@@ -92,8 +96,9 @@ public class AssetReader {
     
     public Spatial loadModel( File f ) {
         log.debug("loadModel(" + f + ")");
+
         // Find the relative path
-        String path = root.relativize(f.toPath()).toString();
+        String path = root.relativize(f.getAbsoluteFile().toPath()).toString();
 
         log.info("Loading asset:" + path);
         

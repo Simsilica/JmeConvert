@@ -1,3 +1,7 @@
+Version 1.1.1
+--------------
+
+
 Version 1.1.0
 --------------
 * Added support for GLTF extensions as user-added data on the

@@ -134,6 +134,11 @@ public class Convert {
     }
     
     public AssetReader getAssetReader() {
+        if( assets == null ) {
+            log.warn("No source root specified, using local directory.");
+            // Create something at least.
+            setSourceRoot(new File("."));
+        }
         return assets;
     }
     
@@ -252,7 +257,7 @@ public class Convert {
             return;
         }
         log.info("Convert:" + f);        
-        Spatial s = assets.loadModel(f);
+        Spatial s = getAssetReader().loadModel(f);
  
         ModelInfo info = new ModelInfo(sourceRoot, f.getName(), s);
         runProcessors(info);          
