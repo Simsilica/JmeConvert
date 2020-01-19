@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+//apply plugin: 'maven'
+
+mainClassName='demo.Main'
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+ext.jmeVersion = "3.3.0-beta1"
+ext.jmecVersion = "1.1.1"
+
+project(":assets") {
+    apply plugin: "java"
+
+    buildDir = rootProject.file("build/assets")
+
+    sourceSets {
+        main {
+            resources {
+                srcDir '.'
+            }
+        }
+    }
+}
+
+
+dependencies {
+    compile "org.jmonkeyengine:jme3-core:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-lwjgl:$jmeVersion"
+
+    compile 'com.simsilica:jmec:1.1.2-SNAPSHOT'
+
+    compile 'com.simsilica:lemur:1.13.0'
+
+    runtime project(':assets')
+}
+
+task wrapper(type: Wrapper) {
+}
+
+
