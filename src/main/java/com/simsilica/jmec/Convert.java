@@ -1,36 +1,36 @@
 /*
  * $Id$
- * 
+ *
  * Copyright (c) 2019, Simsilica, LLC
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions 
+ * modification, are permitted provided that the following conditions
  * are met:
- * 
- * 1. Redistributions of source code must retain the above copyright 
+ *
+ * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the 
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
  *    distribution.
- * 
- * 3. Neither the name of the copyright holder nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -54,7 +54,7 @@ import com.jme3.scene.*;
  */
 public class Convert {
 
-    public static final String[] HEADER = {        
+    public static final String[] HEADER = {
         "        _   __  __   ___    ___ ",
         "     _ | | |  \\/  | | __|  / __|",
         "    | || | | |\\/| | | _|  | (__ ",
@@ -63,9 +63,9 @@ public class Convert {
         "    JME3 Asset Converter v" + BuildInfo.getVersion() + " build:" + BuildInfo.getBuildTime(),
         ""
     };
-    
+
     public static final String ALL_PROBE_OPTIONS = "btrscpdu";
-    
+
     public static final String[] HELP = {
         "Usage: jmec [options] [models]",
         "",
@@ -126,13 +126,13 @@ public class Convert {
     private AssetWriter writer;
     private Probe probe = null;
     private String probeOptions = null;
-    private List<String> modelScripts = new ArrayList<>();
- 
+    private List<ModelScript> modelScripts = new ArrayList<>();
+
     private List<ModelProcessor> processors = new ArrayList<>();
- 
+
     public Convert() {
     }
-    
+
     public AssetReader getAssetReader() {
         if( assets == null ) {
             log.warn("No source root specified, using local directory.");
@@ -141,7 +141,7 @@ public class Convert {
         }
         return assets;
     }
-    
+
     protected AssetWriter getAssetWriter() {
         if( writer == null ) {
             writer = new AssetWriter();
@@ -149,13 +149,13 @@ public class Convert {
         }
         return writer;
     }
-    
+
     protected Probe getProbe() {
         if( probe == null ) {
             probe = new Probe();
             processors.add(0, probe);
         }
-        return probe; 
+        return probe;
     }
 
     public void setSourceRoot( File f ) {
@@ -170,25 +170,25 @@ public class Convert {
         this.sourceRoot = f;
         this.assets = new AssetReader(f);
     }
-    
+
     public File getSourceRoot() {
         return sourceRoot;
     }
-    
+
     public void setTargetRoot( File f ) {
         this.targetRoot = f;
         getAssetWriter().setTarget(f);
     }
-    
+
     public File getTargetRoot() {
         return targetRoot;
     }
- 
+
     public void setTargetAssetPath( String path ) {
         this.targetAssetPath = path;
         getAssetWriter().setAssetPath(path);
     }
-    
+
     public String getTargetAssetPath() {
         return targetAssetPath;
     }
@@ -228,39 +228,52 @@ public class Convert {
                     log.warn("Unknown probe option:" + c);
                     break;
             }
-        }        
+        }
     }
-    
+
     public String getProbeOptions() {
         return probeOptions;
     }
-    
+
     public void addModelScript( String script ) {
+        addModelScript(new ModelScript(this, script));
+    }
+
+    public void addModelScript( ModelScript script ) {
         modelScripts.add(script);
         if( writer == null ) {
-            // It's fine just to add them directly
-            processors.add(new ModelScript(this, script));
+            // It's fine just to add it directly
+            processors.add(script);
         } else {
             // We need to add them before the asset writer
             int index = processors.indexOf(writer);
-            processors.add(index, new ModelScript(this, script)); 
+            processors.add(index, script);
         }
     }
-    
-    public List<String> getModelScripts() {
-        return modelScripts;
+
+    public List<ModelScript> getModelScripts() {
+        return Collections.unmodifiableList(modelScripts);
     }
-    
-    public void convert( File f ) throws IOException {
+
+    public void clearModelScripts() {
+        // Remove them all from the processors list
+        processors.removeAll(modelScripts);
+        // Then clear
+        modelScripts.clear();
+    }
+
+    public ModelInfo convert( File f ) throws IOException {
         if( !f.exists() ) {
             log.error("File doesn't exist:" + f);
-            return;
+            return null;
         }
-        log.info("Convert:" + f);        
+        log.info("Convert:" + f);
         Spatial s = getAssetReader().loadModel(f);
- 
+
         ModelInfo info = new ModelInfo(sourceRoot, f.getName(), s);
-        runProcessors(info);          
+        runProcessors(info);
+
+        return info;
     }
 
     public void runProcessors( ModelInfo info ) {
@@ -289,22 +302,22 @@ public class Convert {
 
     public static void main( String... args ) throws Exception {
 
-        boolean test = false;
+        boolean test = true;
 
         // Forward JUL logging to slf4j
         JulLogSetup.initialize();
 
-        print(HEADER);        
- 
+        print(HEADER);
+
         printMemInfo();
- 
+
         if( args.length == 0 ) {
             print(HELP);
             if( !test ) {
                 return;
             }
         }
- 
+
         Convert convert = new Convert();
         for( Iterator<String> it = Arrays.asList(args).iterator(); it.hasNext(); ) {
             String arg = it.next();
@@ -319,26 +332,26 @@ public class Convert {
             } else if( "-probe".equals(arg) ) {
                 convert.setProbeOptions(it.next());
             } else {
-                convert.convert(new File(arg));               
+                convert.convert(new File(arg));
             }
         }
- 
+
         if( args.length == 0 && test ) {
-            boolean testConvert = true;
+            boolean testConvert = false;
             if( testConvert ) {
                 convert.setSourceRoot(new File("sampleSource3"));
                 convert.setTargetRoot(new File("sampleTarget"));
                 convert.setTargetAssetPath("foo");
                 convert.setProbeOptions("bd");
-                //convert.addModelScript("test-script.groovy");       
-                //convert.convert(new File("sampleSource/scene.gltf"));            
+                //convert.addModelScript("test-script.groovy");
+                //convert.convert(new File("sampleSource/scene.gltf"));
                 convert.convert(new File("sampleSource3/door.gltf"));
             } else {
                 // Test reloading what we converted
-                convert.setSourceRoot(new File("sampleTarget"));
-                convert.setProbeOptions("du");
-                convert.convert(new File("sampleTarget/foo/door.gltf.j3o"));
-            }            
+                convert.setSourceRoot(new File("test-models"));
+                convert.setProbeOptions("A");
+                convert.convert(new File("test-models/test-model.gltf"));
+            }
         }
     }
 }

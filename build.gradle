@@ -8,7 +8,7 @@ buildscript {
         }
         maven {
             url "https://plugins.gradle.org/m2/"
-        }        
+        }
     }
     dependencies {
         // This sucks down a lot of stuff that 'normal' users wouldn't
@@ -31,7 +31,7 @@ mainClassName='com.simsilica.jmec.Convert'
 
 applicationDefaultJvmArgs = ["-Xmx4g", "-Xms512m", "-XX:MaxDirectMemorySize=1024m"]
 
-version='1.1.1'
+version='1.1.2-SNAPSHOT'
 group='com.simsilica'
 
 ext.jmeVersion = "3.2.3-stable"
@@ -81,7 +81,7 @@ sourceSets {
         }
     }
 }
-            
+
 dependencies {
     compile "org.jmonkeyengine:jme3-core:$jmeVersion"
 
@@ -103,11 +103,11 @@ dependencies {
 
     // Trying to get log coloring working properly on windows
     runtime 'org.fusesource.jansi:jansi:1.11'
-    
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.11'
-    
-    
+
+
 }
 
 test {
