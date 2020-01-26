@@ -36,3 +36,17 @@ model.findAll(Geometry.class).each { geom ->
         model.generateMaterial(geom.material, "materials/" + name);
     }
 }
+
+float x = 0;
+println "All nodes...";
+model.findAll(com.jme3.scene.Spatial.class).each { node ->
+    println node
+
+    println "User data keys:" + node.userDataKeys
+
+    String submodel = node.getUserData("submodel");
+    if( submodel != null ) {
+        println "Submode:" + submodel;
+        model.extractSubmodel(node, submodel);
+    }
+}

@@ -42,6 +42,8 @@ import org.slf4j.*;
 
 import com.google.common.io.Files;
 
+import com.jme3.asset.AssetManager;
+import com.jme3.asset.ModelKey;
 import com.jme3.scene.*;
 import com.jme3.util.SafeArrayList;
 
@@ -60,6 +62,7 @@ public class JmecNode extends Node {
     private ModelInfo model;
     private VersionedFile modelFile;
     private SafeArrayList<VersionedScript> scripts = new SafeArrayList<>(VersionedScript.class);
+    private AssetManager assets;
 
     public JmecNode() {
         this((File)null);
@@ -108,6 +111,17 @@ public class JmecNode extends Node {
         scripts.add(new VersionedScript(f));
     }
 
+    /**
+     *  Sets an asset manager that can be used to resolve AssetLinkNodes.
+     */
+    public void setAssetManager( AssetManager assets ) {
+        this.assets = assets;
+    }
+
+    public AssetManager getAssetManager() {
+        return assets;
+    }
+
     @Override
     public void updateLogicalState( float tpf ) {
 
@@ -154,6 +168,40 @@ public class JmecNode extends Node {
 
         try {
             model = convert.convert(f);
+
+            // Clear the cache for any linked dependencies
+            // This should cover AssetLinkNodes as well as any generated materials
+            // _they_ may try to load.
+            for( ModelInfo.Dependency dep : model.getDependencies() ) {
+                log.info("Clear cached dependency for:" + dep.getKey());
+                if( !assets.deleteFromCache(dep.getKey()) ) {
+                    // This can and will happen quite normally... either the first
+                    // time we load or if there are more than one reference to the
+                    // same dependency.  No big deal.
+                    //log.warn("Cached asset was not cleared:" + dep.getKey());
+                }
+
+                // Note: alternately, if we were not concerned about checking
+                // loading, we could directly register the already loaded
+                // child in the dependency object.
+            }
+
+            // Since we imported it and converted it in RAM, the AssetLinkNodes
+            // would not have been resolved.
+            model.getModelRoot().depthFirstTraversal(new SceneGraphVisitorAdapter() {
+                    public void visit( Node node ) {
+                        if( node instanceof AssetLinkNode ) {
+                            if( assets == null ) {
+                                log.error("No AssetManager specified, cannot load asset link:" + node);
+                            } else {
+                                log.info("Loading linked assets for:" + node);
+                                AssetLinkNode link = (AssetLinkNode)node;
+                                link.attachLinkedChildren(assets);
+                            }
+                        }
+                    }
+                });
+
         } catch( IOException e ) {
             log.error("Cannot load:" + f, e);
         } catch( RuntimeException e ) {

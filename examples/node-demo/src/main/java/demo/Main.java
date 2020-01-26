@@ -107,7 +107,23 @@ public class Main extends SimpleApplication {
 
         // Setup the JMEC node
         JmecNode jmecNode = new JmecNode(new File("samples/test-model.gltf"));
+        //JmecNode jmecNode = new JmecNode(new File("samples/test-linking.gltf"));
+        //JmecNode jmecNode = new JmecNode(new File("samples/test-level.gltf"));
         jmecNode.addModelScript(new File("sampleScripts/test-script.groovy"));
+        jmecNode.getConvert().setProbeOptions("A");
+
+        // To resolve child assets we will need to supply an AssetManager
+        // and we will need to make sure it's pointing out at our asset directory
+        // or it won't be able to find assets that we've just written out.
+        jmecNode.setAssetManager(assetManager);
+
+        // Projects that already have ./asset in their runtime classpath do not
+        // need this second part... but those that do, will have to make sure that
+        // the file locator is before the classpath locator.
+     	assetManager.unregisterLocator("/", com.jme3.asset.plugins.ClasspathLocator.class);
+        assetManager.registerLocator("./assets", com.jme3.asset.plugins.FileLocator.class);
+     	assetManager.registerLocator("/", com.jme3.asset.plugins.ClasspathLocator.class);
+
         rootNode.attachChild(jmecNode);
     }
 

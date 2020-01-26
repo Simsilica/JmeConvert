@@ -34,7 +34,7 @@ dependencies {
     compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
     compile "org.jmonkeyengine:jme3-lwjgl:$jmeVersion"
 
-    compile 'com.simsilica:jmec:1.1.2-SNAPSHOT'
+    compile 'com.simsilica:jmec:1.2.0-SNAPSHOT'
 
     compile 'com.simsilica:lemur:1.13.0'
 
