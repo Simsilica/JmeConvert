@@ -120,7 +120,7 @@ public class AssetReader {
         // so we'll make some assumptions... it helps that we control the
         // asset manager ourselves here.
         String extension = Files.getFileExtension(f.getName());
-        if( "gltf".equalsIgnoreCase(extension) ) {
+        if( "gltf".equalsIgnoreCase(extension) || "glb".equalsIgnoreCase(extension) ) {
             // We do special setup for GLTF
             return assets.loadModel(GltfExtrasLoader.createModelKey(path));
         } else {
