@@ -12,6 +12,8 @@ Version 1.2.0 (unreleased)
 * Added support for extracting subgraphs into separate j3o files
     linked into the main model with an AssetLinkNode.
     see: ModelInfo.extractSubmodel()
+* Fixed an issue where the custom extras loader was not being used
+    for GLB files.
 
 
 Version 1.1.1 (latest)
