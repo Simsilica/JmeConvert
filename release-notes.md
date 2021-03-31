@@ -1,3 +1,7 @@
+Version 1.2.1 (unreleased)
+--------------
+
+
 Version 1.2.0 (latest)
 --------------
 * Fixed AssedReader to use canonical path instead of absolute path
