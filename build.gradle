@@ -34,8 +34,7 @@ applicationDefaultJvmArgs = ["-Xmx4g", "-Xms512m", "-XX:MaxDirectMemorySize=1024
 version='1.2.0-SNAPSHOT'
 group='com.simsilica'
 
-ext.jmeVersion = "3.2.3-stable"
-//ext.jmeVersion = "3.3.0-SNAPSHOT"
+ext.jmeVersion = "3.3.2-stable"
 
 // Version meta-data
 ext {
@@ -88,7 +87,8 @@ dependencies {
     // Make sure we have all of the plugins, loaders, etc.
     compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
     compile "org.jmonkeyengine:jme3-plugins:$jmeVersion"
-    compile "org.jmonkeyengine:jme3-blender:$jmeVersion"
+    //compile "org.jmonkeyengine:jme3-blender:$jmeVersion"
+    // Blender is a separate project now and not well supported.
 
     compile 'com.google.guava:guava:19.0'
 
