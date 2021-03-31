@@ -1,4 +1,4 @@
-Version 1.2.0 (unreleased)
+Version 1.2.0 (latest)
 --------------
 * Fixed AssedReader to use canonical path instead of absolute path
     because sometimes paths weren't fully resolved and it confused
@@ -16,7 +16,7 @@ Version 1.2.0 (unreleased)
     for GLB files.
 
 
-Version 1.1.1 (latest)
+Version 1.1.1
 --------------
 * Modified to default -sourceRoot to the current directory if not
     specified.
