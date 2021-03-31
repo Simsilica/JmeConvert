@@ -14,6 +14,8 @@ Version 1.2.0 (latest)
     see: ModelInfo.extractSubmodel()
 * Fixed an issue where the custom extras loader was not being used
     for GLB files.
+* JmecNode for attaching an auto-updating JmeConverted asset to your
+    scene that live-updates when the source model changes.
 
 
 Version 1.1.1
