@@ -1,4 +1,4 @@
-Version 1.3.0 (unreleased)
+Version 1.3.0 (latest)
 --------------
 * Upgraded gradle to 7.4.2 and published to maven central.
 * Modified BuildInfo to load a jmec.build.date properties file in addition
@@ -6,7 +6,7 @@ Version 1.3.0 (unreleased)
     seem to no longer provide a build.time.
 
 
-Version 1.2.0 (latest)
+Version 1.2.0
 --------------
 * Fixed AssedReader to use canonical path instead of absolute path
     because sometimes paths weren't fully resolved and it confused

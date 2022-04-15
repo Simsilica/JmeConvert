@@ -13,7 +13,7 @@ repositories {
 }
 
 ext.jmeVersion = "3.3.2-stable"
-ext.jmecVersion = "1.3.0-SNAPSHOT"
+ext.jmecVersion = "1.3.0"
 
 
 dependencies {
