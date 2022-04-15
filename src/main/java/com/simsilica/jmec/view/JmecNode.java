@@ -174,7 +174,7 @@ public class JmecNode extends Node {
             // _they_ may try to load.
             for( ModelInfo.Dependency dep : model.getDependencies() ) {
                 log.info("Clear cached dependency for:" + dep.getKey());
-                if( !assets.deleteFromCache(dep.getKey()) ) {
+                if( !deleteFromCache(dep) ) {
                     // This can and will happen quite normally... either the first
                     // time we load or if there are more than one reference to the
                     // same dependency.  No big deal.
@@ -214,6 +214,11 @@ public class JmecNode extends Node {
         }
 
         return model == null ? null : model.getModelRoot();
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean deleteFromCache( ModelInfo.Dependency dep ) {
+        return assets.deleteFromCache(dep.getKey());
     }
 
     protected boolean updateDependencies() {
