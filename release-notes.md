@@ -1,5 +1,6 @@
-Version 1.2.1 (unreleased)
+Version 1.3.0 (unreleased)
 --------------
+* Upgraded gradle to 7.4.2 and published to maven central.
 
 
 Version 1.2.0 (latest)
