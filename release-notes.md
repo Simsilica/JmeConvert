@@ -1,6 +1,9 @@
 Version 1.3.0 (unreleased)
 --------------
 * Upgraded gradle to 7.4.2 and published to maven central.
+* Modified BuildInfo to load a jmec.build.date properties file in addition
+    to the normal git.properties.  Newer versions of the git properties plugin
+    seem to no longer provide a build.time.
 
 
 Version 1.2.0 (latest)
