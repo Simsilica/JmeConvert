@@ -1,5 +1,8 @@
 Version 1.3.1 (unreleased)
 --------------
+* Added "assets" to the script bindings so that model scripts can load
+    model-relative assets. Useful for swapping/flipping textures in 
+    materials, etc.. 
 
 
 Version 1.3.0 (latest)

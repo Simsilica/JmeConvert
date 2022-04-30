@@ -77,6 +77,7 @@ public class ModelScript implements ModelProcessor {
         this.engine = scriptEngineManager.getEngineByExtension(ext);
         this.bindings = engine.createBindings();
         bindings.put("convert", convert);
+        bindings.put("assets", convert.getAssetReader().getAssetManager());
 
         log.info("Script engine:" + engine);
         if( engine instanceof Compilable ) {
