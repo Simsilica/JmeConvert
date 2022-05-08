@@ -10,6 +10,8 @@ Version 1.3.1 (unreleased)
     because "myTexture.png (flipped)" is not a real file.
 * Modified the ModelInfo "model" script API to allow easily adding new
     dependencies that will be copied during conversion.     
+* Added Convert.addModelProcessor() to allow embedding application to
+    add custom model processors.
 
 
 Version 1.3.0 (latest)

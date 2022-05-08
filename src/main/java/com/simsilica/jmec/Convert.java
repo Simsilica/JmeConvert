@@ -241,20 +241,24 @@ public class Convert {
 
     public void addModelScript( ModelScript script ) {
         modelScripts.add(script);
-        if( writer == null ) {
-            // It's fine just to add it directly
-            processors.add(script);
-        } else {
-            // We need to add them before the asset writer
-            int index = processors.indexOf(writer);
-            processors.add(index, script);
-        }
+        addModelProcessor(script);
     }
 
     public List<ModelScript> getModelScripts() {
         return Collections.unmodifiableList(modelScripts);
     }
-
+    
+    public void addModelProcessor( ModelProcessor proc ) {
+        if( writer == null ) {
+            // It's fine just to add it directly
+            processors.add(proc);
+        } else {
+            // We need to add them before the asset writer
+            int index = processors.indexOf(writer);
+            processors.add(index, proc);
+        }
+    }
+    
     public void clearModelScripts() {
         // Remove them all from the processors list
         processors.removeAll(modelScripts);
