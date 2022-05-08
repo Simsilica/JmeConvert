@@ -2,7 +2,11 @@ Version 1.3.1 (unreleased)
 --------------
 * Added "assets" to the script bindings so that model scripts can load
     model-relative assets. Useful for swapping/flipping textures in 
-    materials, etc.. 
+    materials, etc..
+* Fixed a few places where AssetKey.toString() was used where AssetKey.getName()
+    is more appropriate.  Prior to this change, texture dependencies with
+    non-standard texture key properties would fail to copy during conversion
+    because "myTexture.png (flipped)" is not a real file.
 
 
 Version 1.3.0 (latest)

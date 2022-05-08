@@ -303,13 +303,13 @@ public class ModelInfo {
             instances.add(asset);
             this.originalKey = asset.getKey();
             if( asset.getKey() != null ) {
-                this.file = new File(root, asset.getKey().toString());
+                this.file = new File(root, asset.getKey().getName());
             }
         }
 
         public int compareTo( Dependency other ) {
-            String s1 = originalKey.toString();
-            String s2 = other.getKey().toString();
+            String s1 = originalKey.getName();
+            String s2 = other.getKey().getName();
             return s1.compareTo(s2);
         }
 

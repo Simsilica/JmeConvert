@@ -77,9 +77,9 @@ public class AssetWriter implements ModelProcessor {
 
     protected String toTargetPath( AssetKey key ) {
         if( assetPath != null ) {
-            return assetPath + "/" + key.toString();
+            return assetPath + "/" + key.getName();
         }
-        return key.toString();
+        return key.getName();
     }
 
     protected String toTargetPath( String path ) {
