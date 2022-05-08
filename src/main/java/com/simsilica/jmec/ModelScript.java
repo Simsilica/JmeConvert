@@ -127,6 +127,7 @@ public class ModelScript implements ModelProcessor {
     public void apply( ModelInfo model ) {
         log.info("Running script:" + scriptName + " against:" + model.getModelName());
         bindings.put("model", model);
+        bindings.put("assets", new ModelAssets(model, convert.getAssetReader().getAssetManager()));
         try {
             if( compiledScript != null ) {
                 compiledScript.eval(bindings);

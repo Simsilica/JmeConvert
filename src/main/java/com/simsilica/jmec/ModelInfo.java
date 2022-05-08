@@ -291,6 +291,23 @@ public class ModelInfo {
         return asset;
     }
 
+    /**
+     *  Adds a dependency that will be automtically copied to the target
+     *  during conversion.  The asset must be resolvable by the specified
+     *  root directory.
+     */
+    public <T extends CloneableSmartAsset> T addExternalDependency( File root, T asset ) {
+        // Note: we require CloneableSmartAsset because it's the only thing that
+        // provides its own key.  If we want to support cases of assets that
+        // are not CloneableSmartAssets then we could modify Dependency
+        // to take a raw object and pass down the AssetKey.  I don't 
+        // yet have any use-cases today so it will wait.  There could
+        // be other reasons I used CloneableSmartAsset that I just don't
+        // see at the moment.  -pspeed:2022-05-07
+        addDependency(root, asset);
+        return asset;
+    }
+
     private Dependency addDependency( File root, CloneableSmartAsset asset ) {
         Dependency result = dependencies.get(asset);
         if( result == null ) {
