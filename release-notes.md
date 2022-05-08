@@ -7,6 +7,8 @@ Version 1.3.1 (unreleased)
     is more appropriate.  Prior to this change, texture dependencies with
     non-standard texture key properties would fail to copy during conversion
     because "myTexture.png (flipped)" is not a real file.
+* Modified the ModelInfo "model" script API to allow easily adding new
+    dependencies that will be copied during conversion.     
 
 
 Version 1.3.0 (latest)

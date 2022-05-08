@@ -281,6 +281,16 @@ public class ModelInfo {
         }
     }
 
+    /**
+     *  Adds a dependency that will be automtically copied to the target
+     *  during conversion.  The asset must be resolvable by this models
+     *  asset manager to be copied correctly.
+     */
+    public <T extends CloneableSmartAsset> T addDependency( T asset ) {
+        addDependency(root, asset);
+        return asset;
+    }
+
     private Dependency addDependency( File root, CloneableSmartAsset asset ) {
         Dependency result = dependencies.get(asset);
         if( result == null ) {
