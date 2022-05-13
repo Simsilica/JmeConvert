@@ -12,6 +12,8 @@ Version 1.3.1 (unreleased)
     dependencies that will be copied during conversion.     
 * Added Convert.addModelProcessor() to allow embedding application to
     add custom model processors.
+* Added a "log" binding for scripts that logs to their script name appended
+    to "script.".    
 
 
 Version 1.3.0 (latest)

@@ -78,6 +78,7 @@ public class ModelScript implements ModelProcessor {
         this.bindings = engine.createBindings();
         bindings.put("convert", convert);
         bindings.put("assets", convert.getAssetReader().getAssetManager());
+        bindings.put("log", LoggerFactory.getLogger("script." + scriptName));
 
         log.info("Script engine:" + engine);
         if( engine instanceof Compilable ) {
