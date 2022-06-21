@@ -94,6 +94,20 @@ public class ModelScript implements ModelProcessor {
         return scriptName;
     }
 
+    /**
+     *  Sets a variable that will be available to the script.
+     */
+    public void setBinding( String name, Object value ) {
+        bindings.put( name, value );
+    }
+
+    /**
+     *  Returns a variable that is available to the scripts.
+     */
+    public Object getBinding( String name ) {
+        return bindings.get(name);
+    }
+
     public static final String loadScript( String scriptName ) {
         File f = new File(scriptName);
         if( f.exists() ) {
