@@ -14,6 +14,8 @@ Version 1.3.1 (unreleased)
     add custom model processors.
 * Added a "log" binding for scripts that logs to their script name appended
     to "script.".    
+* Added ModelScript.set/getBinding for setting script binding variables
+    from embedding applications.
 
 
 Version 1.3.0 (latest)
