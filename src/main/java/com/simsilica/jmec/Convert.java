@@ -134,7 +134,7 @@ public class Convert {
         this(new AssetReader());
     }
 
-    public Convert(AssetReader assets) {
+    public Convert( AssetReader assets ) {
         this.assets = assets;
     }
 

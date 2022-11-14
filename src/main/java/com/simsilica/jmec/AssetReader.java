@@ -66,31 +66,41 @@ public class AssetReader {
     private Path root;
     private final DesktopAssetManager assets;
 
-    public AssetReader( ) {
-        this((URL) null);
+    public AssetReader() {
+        this(new File("."));
     }
 
-    public AssetReader(URL assetConfig ) {
+    public AssetReader( File assetRoot ) {
+        this(assetRoot, (URL) null);
+    }
+
+    public AssetReader( File assetRoot, URL assetConfig ) {
         if( assetConfig == null ) {
             assetConfig = getClass().getResource(DESKTOP_ASSET_CONFIG);
             log.info("Found assetConfig:" + assetConfig);
         }
 
         this.assets = new DesktopAssetManager(assetConfig);
+        setAssetRoot(assetRoot);
     }
 
-    public AssetReader(DesktopAssetManager assets) {
+    public AssetReader( File assetRoot, DesktopAssetManager assets ) {
         this.assets = assets;
+        setAssetRoot(assetRoot);
     }
 
-    public void setAssetRoot(File assetRoot) {
+    public void setAssetRoot( File assetRoot ) {
         if (root != null) {
             assets.unregisterLocator(root.toString(), FileLocator.class);
+        }
+        if (assetRoot == null) {
+            root = null;
+            return;
         }
 
         try {
             this.root = assetRoot.getCanonicalFile().toPath();
-        } catch( java.io.IOException e ) {
+        } catch (java.io.IOException e) {
             throw new RuntimeException("Error getting canonical path for:" + assetRoot, e);
         }
         log.info("Using source asset root:" + root);
@@ -98,11 +108,8 @@ public class AssetReader {
         assets.registerLocator(root.toString(), FileLocator.class);
     }
 
-    public void removeAssetRoot() {
-        if (root != null) {
-            assets.unregisterLocator(root.toString(), FileLocator.class);
-            root = null;
-        }
+    public File getAssetRoot() {
+        return root != null ? root.toFile() : null;
     }
 
     public DesktopAssetManager getAssetManager() {
