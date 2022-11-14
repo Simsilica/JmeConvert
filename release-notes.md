@@ -16,7 +16,12 @@ Version 1.3.1 (unreleased)
     to "script.".    
 * Added ModelScript.set/getBinding for setting script binding variables
     from embedding applications.
-
+* Made AssetReader reusable by exposing AssetReader.setAssetRoot() method. 
+    Convert now uses the same AssetReader and AssetManager and will just reset
+    the asset root path when required instead of creating a new one. This fixes
+    a memory leak issue that was happening because of native memory allocated
+    with previous asset manager instances was not being released properly for
+    some reason and was leading to an OutOfMemoryError in embedding applications.
 
 Version 1.3.0 (latest)
 --------------

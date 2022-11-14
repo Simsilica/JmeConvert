@@ -131,12 +131,17 @@ public class Convert {
     private List<ModelProcessor> processors = new ArrayList<>();
 
     public Convert() {
+        this(new AssetReader());
+    }
+
+    public Convert( AssetReader assets ) {
+        this.assets = assets;
     }
 
     public AssetReader getAssetReader() {
-        if( assets == null ) {
+        if( sourceRoot == null ) {
             log.warn("No source root specified, using local directory.");
-            // Create something at least.
+            // Set something at least.
             setSourceRoot(new File("."));
         }
         return assets;
@@ -168,7 +173,7 @@ public class Convert {
             return;
         }
         this.sourceRoot = f;
-        this.assets = new AssetReader(f);
+        getAssetReader().setAssetRoot(f);
     }
 
     public File getSourceRoot() {
