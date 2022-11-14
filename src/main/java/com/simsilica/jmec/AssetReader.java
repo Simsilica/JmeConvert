@@ -64,17 +64,30 @@ public class AssetReader {
     static Logger log = LoggerFactory.getLogger(AssetReader.class);
 
     private Path root;
-    private DesktopAssetManager assets;
+    private final DesktopAssetManager assets;
 
-    public AssetReader() {
-        this(new File("."));
+    public AssetReader( ) {
+        this((URL) null);
     }
 
-    public AssetReader( File assetRoot ) {
-        this(assetRoot, null);
+    public AssetReader(URL assetConfig ) {
+        if( assetConfig == null ) {
+            assetConfig = getClass().getResource(DESKTOP_ASSET_CONFIG);
+            log.info("Found assetConfig:" + assetConfig);
+        }
+
+        this.assets = new DesktopAssetManager(assetConfig);
     }
 
-    public AssetReader( File assetRoot, URL assetConfig ) {
+    public AssetReader(DesktopAssetManager assets) {
+        this.assets = assets;
+    }
+
+    public void setAssetRoot(File assetRoot) {
+        if (root != null) {
+            assets.unregisterLocator(root.toString(), FileLocator.class);
+        }
+
         try {
             this.root = assetRoot.getCanonicalFile().toPath();
         } catch( java.io.IOException e ) {
@@ -82,13 +95,14 @@ public class AssetReader {
         }
         log.info("Using source asset root:" + root);
 
-        if( assetConfig == null ) {
-            assetConfig = getClass().getResource(DESKTOP_ASSET_CONFIG);
-            log.info("Found assetConfig:" + assetConfig);
-        }
-
-        this.assets = new DesktopAssetManager(assetConfig);
         assets.registerLocator(root.toString(), FileLocator.class);
+    }
+
+    public void removeAssetRoot() {
+        if (root != null) {
+            assets.unregisterLocator(root.toString(), FileLocator.class);
+            root = null;
+        }
     }
 
     public DesktopAssetManager getAssetManager() {
@@ -96,6 +110,10 @@ public class AssetReader {
     }
 
     public Spatial loadModel( File f ) {
+        if (root == null) {
+            throw new RuntimeException("Asset root is not set.");
+        }
+
         log.debug("loadModel(" + f + ")");
         if( !f.exists() ) {
             throw new IllegalArgumentException("Model file does not exist:" + f);
