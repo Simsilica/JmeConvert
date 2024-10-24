@@ -1,21 +1,23 @@
 Version 1.3.1 (unreleased)
 --------------
 * Added "assets" to the script bindings so that model scripts can load
-    model-relative assets. Useful for swapping/flipping textures in 
-    materials, etc..  These assets are also automatically added as 
+    model-relative assets. Useful for swapping/flipping textures in
+    materials, etc..  These assets are also automatically added as
     model dependencies and copied to the target as relevant.
 * Fixed a few places where AssetKey.toString() was used where AssetKey.getName()
     is more appropriate.  Prior to this change, texture dependencies with
     non-standard texture key properties would fail to copy during conversion
     because "myTexture.png (flipped)" is not a real file.
 * Modified the ModelInfo "model" script API to allow easily adding new
-    dependencies that will be copied during conversion.     
+    dependencies that will be copied during conversion.
 * Added Convert.addModelProcessor() to allow embedding application to
     add custom model processors.
 * Added a "log" binding for scripts that logs to their script name appended
-    to "script.".    
+    to "script.".
 * Added ModelScript.set/getBinding for setting script binding variables
     from embedding applications.
+* Added ModelInfo.markSharedAsset() to mark assets that should not be copied
+    to the target directory as part of writing the final model.
 
 
 Version 1.3.0 (latest)

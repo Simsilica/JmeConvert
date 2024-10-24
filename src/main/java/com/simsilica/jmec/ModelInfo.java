@@ -58,6 +58,7 @@ public class ModelInfo {
     private File root;
     private String name;
     private Spatial model;
+    private Set<AssetKey> sharedAssets = new HashSet<>();
     private Map<CloneableSmartAsset, Dependency> dependencies = new HashMap<>();
 
     public ModelInfo( File root, String name, Spatial model ) {
@@ -282,6 +283,23 @@ public class ModelInfo {
     }
 
     /**
+     *  Marks a key as a shared asset that will not be copied during conversion.
+     */
+    public <T extends CloneableSmartAsset> T markSharedAsset( T asset ) {
+        log.debug("markSharedAsset(" + asset + ")");
+        sharedAssets.add(asset.getKey());
+        // Remove any existing dependency tracking we might already have
+        for( Iterator<CloneableSmartAsset> it = dependencies.keySet().iterator(); it.hasNext(); ) {
+            CloneableSmartAsset dep = it.next();
+            if( Objects.equals(dep.getKey(), asset.getKey()) ) {
+                log.debug("Removing dependency tracking for:" + dep);
+                it.remove();
+            }
+        }
+        return asset;
+    }
+
+    /**
      *  Adds a dependency that will be automtically copied to the target
      *  during conversion.  The asset must be resolvable by this models
      *  asset manager to be copied correctly.
@@ -300,7 +318,7 @@ public class ModelInfo {
         // Note: we require CloneableSmartAsset because it's the only thing that
         // provides its own key.  If we want to support cases of assets that
         // are not CloneableSmartAssets then we could modify Dependency
-        // to take a raw object and pass down the AssetKey.  I don't 
+        // to take a raw object and pass down the AssetKey.  I don't
         // yet have any use-cases today so it will wait.  There could
         // be other reasons I used CloneableSmartAsset that I just don't
         // see at the moment.  -pspeed:2022-05-07
@@ -309,6 +327,11 @@ public class ModelInfo {
     }
 
     private Dependency addDependency( File root, CloneableSmartAsset asset ) {
+        log.debug("addDependency(" + root + ", " + asset + ")");
+        if( sharedAssets.contains(asset.getKey()) ) {
+            log.debug("skipping shared asset:" + asset.getKey());
+            return null;
+        }
         Dependency result = dependencies.get(asset);
         if( result == null ) {
             result = new Dependency(root, asset);
