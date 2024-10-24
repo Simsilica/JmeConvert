@@ -64,31 +64,52 @@ public class AssetReader {
     static Logger log = LoggerFactory.getLogger(AssetReader.class);
 
     private Path root;
-    private DesktopAssetManager assets;
+    private final DesktopAssetManager assets;
 
     public AssetReader() {
         this(new File("."));
     }
 
     public AssetReader( File assetRoot ) {
-        this(assetRoot, null);
+        this(assetRoot, (URL) null);
     }
 
     public AssetReader( File assetRoot, URL assetConfig ) {
-        try {
-            this.root = assetRoot.getCanonicalFile().toPath();
-        } catch( java.io.IOException e ) {
-            throw new RuntimeException("Error getting canonical path for:" + assetRoot, e);
-        }
-        log.info("Using source asset root:" + root);
-
         if( assetConfig == null ) {
             assetConfig = getClass().getResource(DESKTOP_ASSET_CONFIG);
             log.info("Found assetConfig:" + assetConfig);
         }
 
         this.assets = new DesktopAssetManager(assetConfig);
+        setAssetRoot(assetRoot);
+    }
+
+    public AssetReader( File assetRoot, DesktopAssetManager assets ) {
+        this.assets = assets;
+        setAssetRoot(assetRoot);
+    }
+
+    public void setAssetRoot( File assetRoot ) {
+        if (root != null) {
+            assets.unregisterLocator(root.toString(), FileLocator.class);
+        }
+        if (assetRoot == null) {
+            root = null;
+            return;
+        }
+
+        try {
+            this.root = assetRoot.getCanonicalFile().toPath();
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Error getting canonical path for:" + assetRoot, e);
+        }
+        log.info("Using source asset root:" + root);
+
         assets.registerLocator(root.toString(), FileLocator.class);
+    }
+
+    public File getAssetRoot() {
+        return root != null ? root.toFile() : null;
     }
 
     public DesktopAssetManager getAssetManager() {
@@ -96,6 +117,10 @@ public class AssetReader {
     }
 
     public Spatial loadModel( File f ) {
+        if (root == null) {
+            throw new RuntimeException("Asset root is not set.");
+        }
+
         log.debug("loadModel(" + f + ")");
         if( !f.exists() ) {
             throw new IllegalArgumentException("Model file does not exist:" + f);
